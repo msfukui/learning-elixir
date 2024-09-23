@@ -30,4 +30,11 @@ mix ecto.migrate
 
 ## References
 
-- https://realworld-docs.netfly.app
+- Elixir実践入門 ――基本文法、Web開発、機械学習、IoT の公式ページ
+  https://gihyo.jp/book/2024/978-4-297-14014-4/support
+
+- 第11章 実践的な Web アプリケーションの開発 に登場したサンプルアプリケーションのリポジトリ
+  https://github.com/introduction-to-practical-elixir/realworld/
+
+- サンプルアプリケーションの元になった説明ページ
+  https://realworld-docs.netfly.app
