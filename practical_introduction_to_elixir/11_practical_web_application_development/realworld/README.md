@@ -1,18 +1,33 @@
 # Realworld
 
-To start your Phoenix server:
+A Sample Web Application using Phoenix Framework
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+ref. https://github.com/introduction-to-practical-elixir/realworld
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## Commands
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+```bash
+mix phx.new realworld
+cd realworld
+docker compose up -d --build
+mix ecto.setup
+mix phx.gen.live Blogs Article articles title:string body:text
+mix ecto.migrate
+mix phx.server
+mix phx.gen.context Blogs Comment comments body:text article_id:references:articles
+mix ecto.migrate```
+mix phx.gen.context Blogs Tag tags tag:string:unique
+mix phx.gen.schema Blogs.ArticleTag articles_tags article_id:references:articles tag_id:references:tags
+mix ecto.migrate
+mix phx.gen.auth Accounts User users
+mix deps.get
+mix ecto.migrate
+mix ecto.gen.migration add_author_id_to_articles
+mix ecto.migrate
+mix ecto.gen.migration add_author_id_to_comments
+mix ecto.migrate
+```
 
-## Learn more
+## References
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+- https://realworld-docs.netfly.app
