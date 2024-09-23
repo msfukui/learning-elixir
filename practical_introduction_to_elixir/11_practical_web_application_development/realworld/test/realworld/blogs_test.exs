@@ -165,5 +165,24 @@ defmodule Realworld.BlogsTest do
       tag = tag_fixture()
       assert %Ecto.Changeset{} = Blogs.change_tag(tag)
     end
+
+    test "list_articles_by_tag/1" do
+      {:ok, %{article: a1}} =
+        Blogs.insert_article_with_tags(%{title: "t", body: "b", tags_string: "Elixir, Phoenix, Nerves, Nx"})
+      {:ok, %{article: a2}} =
+        Blogs.insert_article_with_tags(%{title: "t", body: "b", tags_string: "Elixir"})
+
+      # 「Elixer」タグを持つ記事を検索
+      assert Blogs.list_articles_by_tag("Elixir")
+      |> Enum.map(& &1.id)
+      |> MapSet.new()
+      |> MapSet.equal?(MapSet.new([a1.id, a2.id]))
+
+      # 「Phoenix」タグを持つ記事を検索
+      assert Blogs.list_articles_by_tag("Phoenix")
+      |> Enum.map(& &1.id)
+      |> MapSet.new()
+      |> MapSet.equal?(MapSet.new([a1.id]))
+    end
   end
 end
