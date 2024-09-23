@@ -1,6 +1,7 @@
 defmodule Realworld.BlogsTest do
   use Realworld.DataCase
 
+  alias Realworld.Repo
   alias Realworld.Blogs
 
   describe "articles" do
@@ -16,8 +17,27 @@ defmodule Realworld.BlogsTest do
       assert Blogs.list_articles() == [article]
     end
 
+    test "list_articles_by_tag/1" do
+      {:ok, %{article: a1}} =
+        Blogs.insert_article_with_tags(%{title: "t", body: "b", author_id: user_fixture().id, tags_string: "Elixir, Phoenix, Nerves, Nx"})
+      {:ok, %{article: a2}} =
+        Blogs.insert_article_with_tags(%{title: "t", body: "b", author_id: user_fixture().id, tags_string: "Elixir"})
+
+      # 「Elixir」タグを持つ記事を検索
+      assert Blogs.list_articles_by_tag("Elixir")
+      |> Enum.map(& &1.id)
+      |> MapSet.new()
+      |> MapSet.equal?(MapSet.new([a1.id, a2.id]))
+
+      # 「Phoenix」タグを持つ記事を検索
+      assert Blogs.list_articles_by_tag("Phoenix")
+      |> Enum.map(& &1.id)
+      |> MapSet.new()
+      |> MapSet.equal?(MapSet.new([a1.id]))
+    end
+
     test "get_article!/1 returns the article with given id" do
-      article = article_fixture()
+      article = article_fixture() |> Repo.preload(:comments)
       assert Blogs.get_article!(article.id) == article
     end
 
@@ -43,7 +63,7 @@ defmodule Realworld.BlogsTest do
     end
 
     test "update_article/2 with invalid data returns error changeset" do
-      article = article_fixture()
+      article = article_fixture() |> Repo.preload(:comments)
       assert {:error, %Ecto.Changeset{}} = Blogs.update_article(article, @invalid_attrs)
       assert article == Blogs.get_article!(article.id)
     end
@@ -119,7 +139,6 @@ defmodule Realworld.BlogsTest do
     alias Realworld.Blogs.Tag
 
     import Realworld.BlogsFixtures
-    import Realworld.AccountsFixtures
 
     @invalid_attrs %{tag: nil}
 
@@ -167,25 +186,6 @@ defmodule Realworld.BlogsTest do
     test "change_tag/1 returns a tag changeset" do
       tag = tag_fixture()
       assert %Ecto.Changeset{} = Blogs.change_tag(tag)
-    end
-
-    test "list_articles_by_tag/1" do
-      {:ok, %{article: a1}} =
-        Blogs.insert_article_with_tags(%{title: "t", body: "b", author_id: user_fixture().id, tags_string: "Elixir, Phoenix, Nerves, Nx"})
-      {:ok, %{article: a2}} =
-        Blogs.insert_article_with_tags(%{title: "t", body: "b", author_id: user_fixture().id, tags_string: "Elixir"})
-
-      # 「Elixer」タグを持つ記事を検索
-      assert Blogs.list_articles_by_tag("Elixir")
-      |> Enum.map(& &1.id)
-      |> MapSet.new()
-      |> MapSet.equal?(MapSet.new([a1.id, a2.id]))
-
-      # 「Phoenix」タグを持つ記事を検索
-      assert Blogs.list_articles_by_tag("Phoenix")
-      |> Enum.map(& &1.id)
-      |> MapSet.new()
-      |> MapSet.equal?(MapSet.new([a1.id]))
     end
   end
 end
